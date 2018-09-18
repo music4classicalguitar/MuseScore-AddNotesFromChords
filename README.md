@@ -21,7 +21,9 @@ For an unpatched version of MuseScore 2.x :
 or
 
     Double click on the chords for which you want to add the notes
-  
+or
+
+    Transpose to anything and transpose back
 before using the plugin.
 
 
@@ -45,7 +47,7 @@ See https://github.com/musescore/MuseScore/blob/2.3.2/libmscore/harmony.h
 
 ## How-To
 
-- [Download] (https://github.com/music4classicalguitar/MuseScore-AddNotesFromChords/AddNotesFromChords.qml) and [install the plugin] (https://musescore.org/en/handbook/plugins-0#installation) to your MuseScore 2.x install. Only the [qml file] ([https://github.com/music4classicalguitar/MuseScore-AddNotesFromChords/AddNotesFromChords.qml) is needed, but the examples (in [test/](https://github.com/music4classicalguitar/MuseScore-AddNotesFromChords/test)) are useful to try it out quickly.
+- [Download] (https://github.com/music4classicalguitar/MuseScore-AddNotesFromChords/blob/master/AddNotesFromChords.qml) and [install the plugin] (https://musescore.org/en/handbook/plugins-0#installation) to your MuseScore 2.x install. Only the [qml file] (https://github.com/music4classicalguitar/MuseScore-AddNotesFromChords/blob/master/AddNotesFromChords.qml) is needed, but the examples (in [test/](https://github.com/music4classicalguitar/MuseScore-AddNotesFromChords/tree/master/test)) are useful to try it out quickly.
 
 - enable the AddNotesFromChords plugin in 'Plugins > Plugin Manager' dialog
 - reload the plugins with 'Plugins - Plugin Manager - Reload Plugins' or restart MuseScore.
