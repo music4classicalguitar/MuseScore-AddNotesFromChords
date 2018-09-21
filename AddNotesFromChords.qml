@@ -526,6 +526,27 @@ MuseScore {
 		return note;
 	}
 	
+	function convertNote(notePart,debug) {
+		var note="", alteration="", pattern=/((##)|#|x|(bb)|b)$/, match;
+		match=pattern.exec(notePart);
+		if (match) {
+			alteration=match[0];
+			if (alteration=="x") alteration="##";
+			note=notePart.substring(0,match.index);
+		} else note=notePart;
+		if (debug) console.log("NotePart '"+notePart+"' note '"+note+"' alteration '"+alteration+"'");
+		switch (note) {
+			case "Do" : note="C" ; break;
+			case "Re" : case "Ré" : note="D" ; break;
+			case "Mi" : note="E" ; break;
+			case "Fa" : note="F" ; break;
+			case "So" : case "Sol" : note="G" ; break;
+			case "La" : note="A" ; break;
+			case "Si" : case "Ti" : note="B" ; break;
+		}
+		return note+alteration;
+	}
+	
 	// see https://en.wikipedia.org/wiki/Chord_names_and_symbols_(popular_music)
 	function parseChord(chord,debug) {
 		var chordrest;
@@ -534,19 +555,18 @@ MuseScore {
 		var root="", qualifierMatch="", qualifier="", alteration="", base="", n1="C", n2="", n3="", n5="", n6="", n7="", n9="", n11="", n13="";
 		if (debug) console.log("   chord : '"+chord+"'");
 		// root
-		var pattern=/^[ABCDEFGabcdefg]((##)|x|(bb)|b)?/;
+		var pattern=/^((Do)|(R[eé])|(Mi)|(Fa)|(Sol?)|(La)|([ST]i)|[ABCDEFG])((##)|#|x|(bb)|b)?/;
 		var match=pattern.exec(chord);
 		if (match) {
-			root=match[0];
+			root=convertNote(match[0],debug);
 			chordrest=chord.substring(match.index+match[0].length);
 			if (debug) console.log("   chordrest : '"+chordrest+"' root '"+root+"'");
 			// alternate base note
-			pattern=/[\/][ABCDEFGabcdefg]((##)|#|x|(bb)|b)?$/;
+			pattern=/[\/]((Do)|(R[eé])|(Mi)|(Fa)|(Sol?)|(La)|([ST]i)|[ABCDEFG])((##)|#|x|(bb)|b)?$/;
 			match=pattern.exec(chordrest);
 			if (match) {
+				base=convertNote(match[0].substring(1),debug);
 				chordrest=chordrest.substring(0,match.index);
-				if (match[0].substring(2)=="x") base=match[0].substring(1,1)+"##";
-				else base=match[0].substring(1);
 				if (debug) console.log("   chordrest : '"+chordrest+"' base '"+base+"'");
 			}
 			// qualifier
