@@ -16,13 +16,13 @@ import QtQuick.Controls 1.1
 import MuseScore 1.0
 
 MuseScore {
-	version:  "1.0"
+	version:  "2.0"
 	description: "Add notes from harmonies/chords"	
 	menuPath: "Plugins.Add notes from chords"
 	pluginType: "dialog"
 
 	id:window
-	width:  320; height: 270;
+	width:  350; height: 320;
 	
 	Label {
 		id: textHeader
@@ -103,12 +103,58 @@ MuseScore {
 		anchors.rightMargin: 5
     }
 	Label {
+		id: labelTranspose
+		width: 180
+		wrapMode: Text.WordWrap
+		text: qsTr("Transpose (half steps)")
+		font.pointSize:13
+		anchors.top: labelOverwriteVoice.bottom
+		anchors.left: window.left
+		anchors.topMargin: 10
+		anchors.leftMargin: 5
+	}
+    ComboBox {
+    	id: comboBoxTranspose
+    	width: 150
+    	currentIndex: 11
+   	 	model: ListModel {
+        	id: comboBoxTransposeId
+        	ListElement { text: " 11 major seventh"; }
+        	ListElement { text: " 10 minor seventh"; }
+        	ListElement { text: "  9 major sixth"; }
+        	ListElement { text: "  8 augmented fifth"; }
+        	ListElement { text: "  7 perfect fifth"; }
+        	ListElement { text: "  6 diminished fifth"; }
+        	ListElement { text: "  5 perfect fourth"; }
+        	ListElement { text: "  4 major third"; }
+        	ListElement { text: "  3 minor third"; }
+        	ListElement { text: "  2 major second"; }
+        	ListElement { text: "  1 minor second"; }
+        	ListElement { text: "  0 perfect unison"; }
+        	ListElement { text: " -1 minor second"; }
+        	ListElement { text: " -2 major second"; }
+        	ListElement { text: " -3 minor third"; }
+        	ListElement { text: " -4 major third"; }
+        	ListElement { text: " -5 perfect fourth"; }
+        	ListElement { text: " -6 diminished fifth"; }
+        	ListElement { text: " -7 perfect fifth"; }
+        	ListElement { text: " -8 augmented fifth"; }
+        	ListElement { text: " -9 major sixth"; }
+        	ListElement { text: "-10 minor seventh"; }
+        	ListElement { text: "-11 major seventh"; }
+    	}
+		anchors.top: overwriteVoice.bottom
+		anchors.left: labelOctaves.right
+		anchors.topMargin: 5
+		anchors.rightMargin: 5
+	}
+	Label {
 		id: labelOctaves
 		width: 180
 		wrapMode: Text.WordWrap
 		text: qsTr("(Scientific Pitch Notation)\nLowest note >=")
 		font.pointSize:13
-		anchors.top: labelOverwriteVoice.bottom
+		anchors.top: labelTranspose.bottom
 		anchors.left: window.left
 		anchors.topMargin: 10
 		anchors.leftMargin: 5
@@ -128,18 +174,36 @@ MuseScore {
         	ListElement { text: "C2"; }
         	ListElement { text: "C1"; }
     	}
-		anchors.top: overwriteVoice.bottom
-		anchors.left: labelOctaves.right
+		anchors.top: comboBoxTranspose.bottom
+		anchors.left: labelTranspose.right
 		anchors.topMargin: 5
 		anchors.rightMargin: 5
 	}
+	Label {
+		id: labelGermanSpelling
+		wrapMode: Text.WordWrap
+		width: 180
+		text: qsTr("German note spelling\n(B->Bb, H->B)")
+		anchors.top: labelOctaves.bottom
+		anchors.left: window.left
+		anchors.topMargin: 10
+		anchors.leftMargin: 5
+	}
+	CheckBox {
+		id: germanSpelling
+        checked: false
+		anchors.top: comboBoxOctaves.bottom
+		anchors.left: labelOctaves.right
+		anchors.topMargin: 10
+		anchors.rightMargin: 5
+    }
 	Label {
 		id: textMessage
 		wrapMode: Text.WordWrap
 		color: "black"
 		width: 300
 		text: qsTr("If chords are not recognized only the root and possible bass note (after a forward slash) are added.")
-		anchors.top: labelOctaves.bottom
+		anchors.top: labelGermanSpelling.bottom
 		anchors.left: window.left
 		anchors.topMargin: 10
 		anchors.leftMargin: 5
@@ -294,19 +358,6 @@ MuseScore {
 			'MAXTYPE'
 		]);
 		return elementTypes[elType];
-	}
-	
-	function tpcAndNoteName(value, searchCol) {
-		var tpcsAndNoteNames = [
-			[-1, "Fbb"], [0, "Cbb"], [1, "Gbb"], [2, "Dbb"], [3, "Abb"], [4, "Ebb"], [5, "Bbb"],
-			[6, "Fb"], [7, "Cb"], [8, "Gb"], [9, "Db"], [10, "Ab"], [11, "Eb"], [12, "Bb"], 
-			[13, "F"], [14, "C"], [15, "G"], [16, "D"], [17, "A"], [18, "E"], [19, "B"], 
-			[20, "F#"], [21, "C#"], [22, "G#"], [23, "D#"], [24, "A#"], [25, "E#"], [26, "B#"],
-			[27, "F##"], [28, "C##"], [29, "G##"], [30, "D##"], [31, "A##"], [32, "E##"], [33, "B##"]
-		];
-		for (var i=0;i<tpcsAndNoteNames.length;++i) {
-			if (value==tpcsAndNoteNames[i][searchCol]) return tpcsAndNoteNames[i][1-searchCol] ;
-		}
 	}
 
 	// created from chords.xml
@@ -495,20 +546,37 @@ MuseScore {
 			}
 			return null;
 	}
+	
+	function tpcAndNoteName(value, searchCol) {
+		var tpcsAndNoteNames = [
+			[-2, "X"], // TPC_INVALID
+			[-1, "Fbb"], [0, "Cbb"], [1, "Gbb"], [2, "Dbb"], [3, "Abb"], [4, "Ebb"], [5, "Bbb"],
+			[6, "Fb"], [7, "Cb"], [8, "Gb"], [9, "Db"], [10, "Ab"], [11, "Eb"], [12, "Bb"], 
+			[13, "F"], [14, "C"], [15, "G"], [16, "D"], [17, "A"], [18, "E"], [19, "B"], 
+			[20, "F#"], [21, "C#"], [22, "G#"], [23, "D#"], [24, "A#"], [25, "E#"], [26, "B#"],
+			[27, "F##"], [28, "C##"], [29, "G##"], [30, "D##"], [31, "A##"], [32, "E##"], [33, "B##"]
+		];
+		for (var i=0;i<tpcsAndNoteNames.length;++i) {
+			if (value==tpcsAndNoteNames[i][searchCol]) return tpcsAndNoteNames[i][1-searchCol] ;
+		}
+	}
 
-	function transposeTpcArray(tpcArray,transposeTo,useDoubleSharpsFlats) {
+	function transposeTpcArray(tpcArray,transposeTo,useSharpsFlats) {
 		if (tpcArray == null) return new Array();
-		var diff=14-transposeTo;
+		var diff=14-transposeTo+11-comboBoxTranspose.currentIndex;
 		var tpcNewArray=new Array() ;
 		var n;
 		for (var i=0;i<tpcArray.length;++i) {
 			n=tpcArray[i]-diff;
-			if (useDoubleSharpsFlats) {
+			if (useSharpsFlats==2) {
 				while (n<-1) n+=12;
 				while (n>33) n-=12;
-			} else {
+			} else if (useSharpsFlats==1) {
 				while (n<6) n+=12;
 				while (n>26) n-=12;
+			} else if (useSharpsFlats==0) {
+				while (n<8) n+=12;
+				while (n>24) n-=12;
 			}
 			tpcNewArray[i]=n;
 		}
@@ -527,14 +595,21 @@ MuseScore {
 	}
 	
 	function convertNote(notePart,debug) {
-		var note="", alteration="", pattern=/((##)|#|x|(bb)|b)$/, match;
-		match=pattern.exec(notePart);
+		var note="", alteration="", pattern=/^(x|(##)|#|(bb)|b|(isis)|(is)|(eses)|(ses)|(sas)|(es)|s)$/, match;
+		match=/^((Do)|(R[eé])|(Mi)|(Fa)|(Sol?)|(La)|([ST]i))/.exec(notePart);
+		if (match) note=match[0];
+		else note=notePart.substring(0,1);
+		if (debug) console.log("convertNote NotePart '"+notePart+"' note '"+note+"' length "+note.length);
+		match=pattern.exec(notePart.substring(note.length));
 		if (match) {
 			alteration=match[0];
-			if (alteration=="x") alteration="##";
-			note=notePart.substring(0,match.index);
-		} else note=notePart;
-		if (debug) console.log("NotePart '"+notePart+"' note '"+note+"' alteration '"+alteration+"'");
+			switch (alteration) {
+				case 'x' : case 'isis' : alteration='##'; break ;
+				case 'is' : alteration='#'; break ;
+				case 'eses' : case 'ses' : case 'sas' : alteration='bb'; break ;
+				case 'es' : case 's' : alteration='b'; break ;
+			}
+		}
 		switch (note) {
 			case "Do" : note="C" ; break;
 			case "Re" : case "Ré" : note="D" ; break;
@@ -544,6 +619,13 @@ MuseScore {
 			case "La" : note="A" ; break;
 			case "Si" : case "Ti" : note="B" ; break;
 		}
+		note=note.toUpperCase();
+		// http://www.musicians-place.de/harmonielehre/kurs-1/die-vorzeichen.html
+		if (germanSpelling.checked&&note=="B") {
+			if (alteration=="") alteration="b"
+		}
+		if (note=="H") note="B";
+		if (debug) console.log("convertNote NotePart '"+notePart+"' note '"+note+"' alteration '"+alteration+"' germanSpelling '"+germanSpelling.checked);
 		return note+alteration;
 	}
 	
@@ -552,17 +634,25 @@ MuseScore {
 		var chordrest;
 		var lowerCaseMinorChords=false;
 		var noteSpelling;
-		var root="", qualifierMatch="", qualifier="", alteration="", base="", n1="C", n2="", n3="", n5="", n6="", n7="", n9="", n11="", n13="";
+		var root="", qualifierMatch="", qualifier="", alteration="", base="", n1="C", n2="", n3="", n4="", n5="", n6="", n7="", n9="", n11="", n13="";
 		if (debug) console.log("   chord : '"+chord+"'");
 		// root
-		var pattern=/^((Do)|(R[eé])|(Mi)|(Fa)|(Sol?)|(La)|([ST]i)|[ABCDEFG])((##)|#|x|(bb)|b)?/;
+		var pattern=/^((((Do)|(R[eé])|(Mi)|(Fa)|(Sol?)|(La)|([ST]i))((##)|#|x|(bb)|b)?)|([BCDFGHbcdfgh]((##)|#|x|(bb)|b|(eses)|(es)|(isis)|(is))?)|([Aa]((##)|#|x|(bb)|b|(isis)|(is)|(sas)|s)?)|([Ee]((##)|#|x|(bb)|b|(isis)|(is)|(ses)|s)?))/;
 		var match=pattern.exec(chord);
 		if (match) {
-			root=convertNote(match[0],debug);
-			chordrest=chord.substring(match.index+match[0].length);
+			if (debug) console.log("   match: '"+match[0]+"' followed by '"+chord.substring(match.index+match[0].length,match.index+match[0].length+2)+"'");
+			if (match[0].substring(0,1).toLowerCase()==match[0].substring(0,1)) lowerCaseMinorChords=true;
+			var l=match.index+match[0].length;
+			if (chord.substring(l,l+2)=="us") {
+				root=convertNote(match[0].substring(0,match[0].length-1),debug);
+				chordrest=chord.substring(match.index+match[0].length-1);
+			} else {				
+				root=convertNote(match[0],debug);
+				chordrest=chord.substring(match.index+match[0].length);
+			}
 			if (debug) console.log("   chordrest : '"+chordrest+"' root '"+root+"'");
 			// alternate base note
-			pattern=/[\/]((Do)|(R[eé])|(Mi)|(Fa)|(Sol?)|(La)|([ST]i)|[ABCDEFG])((##)|#|x|(bb)|b)?$/;
+			pattern=/[\/]((((Do)|(R[eé])|(Mi)|(Fa)|(Sol?)|(La)|([ST]i))((##)|#|x|(bb)|b)?)|([BCDFGHbcdfgh]((##)|#|x|(bb)|b|(eses)|(es)|(isis)|(is))?)|([Aa]((##)|#|x|(bb)|b|(isis)|(is)|(sas)|s)?)|([Ee]((##)|#|x|(bb)|b|(isis)|(is)|(ses)|s)?))$/;
 			match=pattern.exec(chordrest);
 			if (match) {
 				base=convertNote(match[0].substring(1),debug);
@@ -570,48 +660,60 @@ MuseScore {
 				if (debug) console.log("   chordrest : '"+chordrest+"' base '"+base+"'");
 			}
 			// qualifier
-			pattern=/^((Maj7Lyd)|Δ|(Maj)|(Ma)|M|(maj)|m|(min)|[-]|[+]|(aug5?)|(5#$)|o|°|(dim5?)|(5b$)|ø|Ø|(sus2)|(sus)|(sus4)|(sus#4)|(5$)|(2$)|(Lyd)|(Phryg)|(Tristan$))/;
+			pattern=/^((M7)|(Δ7)|(Maj7Lyd)|(Maj7)|(Ma7)|Δ|(Maj)|(Ma)|M|(min)|(mb5)|(m[(]b5[)])|(m[+])|m|[-]|[+]|(aug5?)|(5#$)|o|°|(dim5?)|(5b$)|ø|Ø|(sus2)|(sus4)|(sus#4)|(sus)|(5$)|(2$)|((7|9|(11)|(13))[+])|(Lyd$)|(Phryg$)|(Tristan$))/;
 			match=pattern.exec(chordrest);
 			if (match) {
 				chordrest=chordrest.substring(match.index+match[0].length);
 				qualifierMatch=match[0];
 				switch (match[0]) {
-					case 'Δ' : case 'Maj' : case 'Ma' : case 'maj' : qualifier= "major"; n3="E"; n5="G"; break; // C–E-G
-					case 'm' : case 'min' : case '-' : qualifier= "minor"; n3="Eb"; n5="G"; break; // C–Eb-G
+					case 'M7' : case 'Δ7' : case 'Ma7' : case 'Maj7' : 
+						if (lowerCaseMinorChords) { qualifier= "minor"; n3="Eb"; n5="G"; n7="B"; } // C–Eb-G-B minorMajor7
+						else { qualifier= "major"; n3="E"; n5="G"; n7="B"; } // C-E-G-B
+						break; 
+					case 'Δ' : case 'Maj' : case 'Ma' : qualifier= "major"; n3="E"; n5="G"; break; // C–E-G
+					case 'm+' : qualifier= "minor"; n3="Eb"; n5="G#"; break; // C–Eb-G#
+					case 'min' : case 'm' : case '-' : qualifier= "minor"; n3="Eb"; n5="G"; break; // C–Eb-G
 					case '+' : case 'aug' : case 'aug5' : case '5#' : qualifier= "augmented"; n3="E"; n5="G#"; break; // C–E–G#
-					case 'o' : case '°' : case 'dim' : case 'dim5' : qualifier= "diminished"; n3="Eb"; n5="Gb"; break; // C–Eb–Gb
+					case 'o' : case '°' : case 'dim' : case 'dim5' : case 'mb5' : case 'm(b5)' : qualifier= "diminished"; n3="Eb"; n5="Gb"; break; // C–Eb–Gb
 					case '5b' : qualifier= "b5"; n3="E"; n5="Gb"; break; // C–E–Gb
-					case 'sus2' : qualifier= "suspended 2"; n3="D"; n5="G"; break; // C–D–G
+					case 'sus2' : qualifier= "suspended 2"; n2="D"; n3=""; n5="G"; break; // C–D–G
 					case 'sus4' : case 'sus' : qualifier= "suspended 4"; n3="F"; n5="G"; break; // C–F–G
 					case 'sus#4' : qualifier= "suspended #4"; n3="F#"; n5="G"; break; // C–F#-G
 					case '5' : qualifier= "power"; n5="G"; break; // C-G
 					case '2' : qualifier= "major"; n2="D"; n3="E"; n5="G"; break; // C–D-E-G
+					case '7+' : qualifier= "augmented"; n3="E"; n5="G#"; n7="Bb"; break; // C-E-G#-Bb
+					case '9+' : qualifier= "augmented"; n3="E"; n5="G#"; n7="Bb"; n9="D"; break; // C-E-G#-Bb-D
+					case '11+' : qualifier= "augmented"; n3="E"; n5="G#"; n7="Bb"; n9="D"; n11="F"; break; // C-E-G#-Bb-D-F
+					case '13+' : qualifier= "augmented"; n3="E"; n5="G#"; n7="Bb"; n9="D"; n11="F"; n13="A"; break; // C-E-G#-Bb-D-F-A
 					case 'Maj7Lyd' : qualifier= "Major 7 Lydian"; n3="E"; n5="G"; n7="B"; n9="D"; n11="F#"; n13="A"; break; // C–E-G-B-D-F#-A
 					// https://en.wikipedia.org/wiki/Lydian_chord
 					case 'Lyd' : qualifier= "Lydian"; n3="E"; n5="G"; n7="B"; n11="F#"; break; // C–E-G-B-F# major 7♯11
 					// https://en.wikipedia.org/wiki/So_What_chord m7♭911♭13 [no 5] 
 					case 'Phryg' : qualifier= "Phrygian"; n3="Eb"; n7="Bb"; n9="Db"; n11="F"; n13="Ab"; break; // C–Eb-Bb-Db-Ab
 					// https://en.wikipedia.org/wiki/Tristan_chord
-					case 'Tristan' : qualifier= "Tristan"; n3="F#"; n5="A#"; n9="D"; break; // C–F#-A#-C#
-					 
+					case 'Tristan' : qualifier= "Tristan"; n3="F#"; n5="A#"; n9="D"; break; // C–F#-A#-C#					 
 				}
 				if (debug) console.log("   chordrest : '"+chordrest+"' match '"+match[0]+"'");
+			} else if (lowerCaseMinorChords) { qualifier= "minor"; n3="Eb"; n5="G"; // C–Eb-G
 			} else { qualifier= "major"; n3="E"; n5="G"; } // C–E-G
 			if (debug) console.log("   chordrest : '"+chordrest+"' qualifierMatch '"+qualifierMatch+"' qualifier '"+qualifier+"'");
-			pattern=/^((sus)|[+]|([b#]5)|6|(7alt)|7|(Δ7)|(Ma7)|(Maj7)|([#]?(11))|([b#]?(9|(13))))/;
+			pattern=/^((add)|2|4|(sus4)|(sus)|[+]|([b#]5)|([\(][b#]5[\)])|6|(7alt)|7|(Δ7)|(M7)|(Ma7)|(Maj7)|([#]?(11))|([b#]?(9|(13))))/;
 			match=pattern.exec(chordrest);
 			if (match) {
 				chordrest=chordrest.substring(match.index+match[0].length);
 				if (debug) console.log("   chordrest : '"+chordrest+"' first alt match '"+match[0]+"'");
 				switch (match[0]) {
-					case 'sus' : n3="F"; break;
+					case '2' : n2="D"; break;
+					case '4' : n4="F"; break;
+					case 'sus4' : case 'sus' : n3="F"; break;
 					case '+' : n5="G#"; break;
-					case 'b5' : n5="Gb"; break;
-					case '#5' : case '+' : n5="G#"; break;
+					case 'b5' : case '(b5)' : n5="Gb"; break;
+					case '#5' : case '+' : case '(#5)' : n5="G#"; break;
 					case '6' : n6="A"; break;
 					case '7' : if (qualifier=="major"&&qualifierMatch!="") n7="B"; else n7="Bb"; break;
-					case '7alt' : n5=""; n7="Bb"; n9="Db"; n11="F#"; n13="Ab"; break; // https://en.wikipedia.org/wiki/Altered_chord
-					case 'Δ7' : case 'Ma7' : case 'Maj7' : if (qualifier=="minor"&&qualifierMatch!="") n7="B"; break;
+					// https://en.wikipedia.org/wiki/Altered_chord
+					case '7alt' : n5=""; n7="Bb"; n9="Db"; n11="F#"; n13="Ab"; break;
+					case 'Δ7' : case 'M7' : case 'Ma7' : case 'Maj7' : if (qualifier=="minor"&&qualifierMatch!="") n7="B"; break;
 					case 'b9' : n7="Bb"; n9="Db"; break;
 					case '9' : if (qualifier=="major"&&qualifierMatch!="") { n7="B"; n9="D"; } else { n7="Bb"; n9="D"; } break;
 					case '#9' : n7="Bb"; n9="D#"; break;
@@ -623,35 +725,42 @@ MuseScore {
 				}
 			}
 			while (chordrest!="") {
-				pattern=/^((add ?)|(sus)|[+]|([b#]5)|7|([b#]?(9|(13)))|(#?(11))|([(]no 3[)]))/;
+				pattern=/^(((add)?(2|([b#]5)|(#?7)|([b#]?(9|(13)))|(#?(11))))|(sus)|([(]no 3[)]))/;
 				match=pattern.exec(chordrest);
 				if (match) {
 					chordrest=chordrest.substring(match.index+match[0].length);
 					console.log("   chordrest : '"+chordrest+"' while match '"+match[0]+"'");
 					switch (match[0]) {
+						case 'add2' : n2="D"; break;
 						case '(no 3)' : n3=""; break;
 						case 'sus' : n3="F"; break;
-						case 'b5' : n5="Gb"; break;
-						case '#5' : case '+' : n5="G#"; break;
-						case '7' : n7="Bb"; break;
-						case 'b9' : n9="Db"; break;
-						case '9' : n9="D"; break;
-						case '#9' : n9="D#"; break;
-						case '11' : n11="F"; break;
-						case '#11' : n11="F#"; break;
-						case 'b13' : n13="Ab"; break;
-						case '13' : n13="A"; break;
-						case '#13' : n13="A#"; break;
+						case 'addb5' : case 'b5' : n5="Gb"; break;
+						case 'add#5' : case '#5' : case '+' : n5="G#"; break;
+						case 'add7' : case '7' : n7="Bb"; break;
+						case 'add#7' : case '#7' : n7="B"; break;
+						case 'addb9' : case 'b9' : case 'b9' : n9="Db"; break;
+						case 'add9' : case '9' : n9="D"; break;
+						case 'add#9' : case '#9' : n9="D#"; break;
+						case 'add11' : case '11' : n11="F"; break;
+						case 'add#11' : case '#11' : n11="F#"; break;
+						case 'addb13' : case 'b13' : n13="Ab"; break;
+						case 'add13' : case '13' : n13="A"; break;
+						case 'add#13' : case '#13' : n13="A#"; break;
 					}
 				} else break;
 			}
 		}
-		if (debug) console.log("Chord : '"+chord+" root '"+root+"' qualifierMatch '"+qualifierMatch+"' qualifier '"+qualifier+"' alteration '"+alteration+"' base '"+base+"'");
-		if (debug) console.log("  '"+n1+"' '"+n2+"' '"+n3+"' '"+n5+"' '"+n6+"' '"+n7+"' '"+n9+"' '"+n11+"' '"+n13+"'");
+		if (debug) console.log("Chord : '"+chord+"' root '"+root+"' qualifierMatch '"+qualifierMatch+"' qualifier '"+qualifier+"' alteration '"+alteration+"' base '"+base+"' chordrest : '"+chordrest+"'");
+		if (chordrest!="") {
+			if (debug) console.log("Chord : '"+chord+"' not recognised");
+			return [];
+		}
+		if (debug) console.log("  '"+n1+"' '"+n2+"' '"+n3+"' '"+n4+"' '"+n5+"' '"+n6+"' '"+n7+"' '"+n9+"' '"+n11+"' '"+n13+"'");
 		var n=-1,tpcArray=new Array(), rootTpc, baseTpc;
 		if (n1!="") tpcArray[++n]=tpcAndNoteName(n1,1);
 		if (n2!="") tpcArray[++n]=tpcAndNoteName(n2,1);
 		if (n3!="") tpcArray[++n]=tpcAndNoteName(n3,1);
+		if (n4!="") tpcArray[++n]=tpcAndNoteName(n4,1);
 		if (n5!="") tpcArray[++n]=tpcAndNoteName(n5,1);
 		if (n6!="") tpcArray[++n]=tpcAndNoteName(n6,1);
 		if (n7!="") tpcArray[++n]=tpcAndNoteName(n7,1);
@@ -659,7 +768,7 @@ MuseScore {
 		if (n11!="") tpcArray[++n]=tpcAndNoteName(n11,1);
 		if (n13!="") tpcArray[++n]=tpcAndNoteName(n13,1);
 		rootTpc=tpcAndNoteName(root,1);
-		tpcArray=transposeTpcArray(tpcArray,rootTpc,false);
+		tpcArray=transposeTpcArray(tpcArray,rootTpc,0);
 		if (base!="") {
 			baseTpc=tpcAndNoteName(base,1);
 			tpcArray=[baseTpc].concat(tpcArray);
@@ -682,7 +791,7 @@ MuseScore {
 	
 	function addChord(cursor, harmonyArray, debug) {
 		if (harmonyArray[0]==-2) return;
-		if (debug) console.log("harmonyArray[0]>"+harmonyArray[0]+"<");
+		if (debug) console.log("Add chord harmonyArray[0]>"+harmonyArray[0]+"<");
 		var cursor, rootTpc, baseTpc, harmonyId, harmonyName, harmonyText, harmonyDuration, harmonyTick;
 		rootTpc=harmonyArray[0];
 		baseTpc=harmonyArray[1];
@@ -710,28 +819,30 @@ MuseScore {
 		for (var i=0;i<tpcArray.length;++i) info+=tpcAndNoteName(tpcArray[i],0)+" ";
 		info+=")";
 		if (rootTpc==-2) return;
-		if (tpcArray.length==0) { if (rootTpc>-2) tpcArray=[rootTpc]; }
+		if (tpcArray.length==0) { if (rootTpc>-2) tpcArray=[rootTpc]; else return; }
 		if (debug) console.log("Add notes from chord duration : "+harmonyDuration[0]+"/"+harmonyDuration[1]+" id : "+harmonyId+" name : "+harmonyName+"  at : "+harmonyTick+" current position "+cursor.tick+" tpcArray : >"+tpcArray+"< info :"+info);
 		var referenceC = 108-comboBoxOctaves.currentIndex*12; // C3 : 48 for C in octave -1, inc-/de-crease by 12 for each octave up/down.
 		var pitch, lastpitch=referenceC;
 		if (!setCursorToTime(cursor, harmonyTick, false)) return;
 		if (cursor.tick!=harmonyTick) { if (debug) console.log("  Error in position, at "+cursor.tick+" instead of "+harmonyTick);}
 		var cur_time=cursor.tick;
-		cursor.setDuration(harmonyDuration[0],harmonyDuration[1]);
 		pitch = ((((tpcArray[0]-2+12)%12)*7)%12)+referenceC;
 		while(pitch<lastpitch) pitch+=12;
 		lastpitch=pitch;
-		if (debug) console.log("Add first note, pitch "+pitch);
+		if (debug) console.log("Add first note, pitch "+pitch+" duration : "+harmonyDuration[0]+"/"+harmonyDuration[1]);
+		cursor.setDuration(harmonyDuration[0],harmonyDuration[1]);
 		cursor.addNote(pitch); //add 1st note
 		var next_time=cursor.tick;
 		if (!setCursorToTime(cursor, harmonyTick, true)) return;
 		var chord = cursor.element; //get the chord created when 1st note was inserted
 		for(var i=1; i<tpcArray.length; i++) {
-			pitch = ((((tpcArray[i]-2+12)%12)*7)%12)+referenceC;
-			while(pitch<lastpitch) pitch+=12;
-			lastpitch=pitch;
-			if (debug) console.log("Add note "+i+", pitch "+pitch);
-			chord.add(createNote(pitch, tpcArray[i], tpcArray[i], NoteHead.HEAD_AUTO)); //add notes to the chord
+			if (tpcArray[i]) {
+				pitch = ((((tpcArray[i]-2+12)%12)*7)%12)+referenceC;
+				while(pitch<lastpitch) pitch+=12;
+				lastpitch=pitch;
+				if (debug) console.log("Add note "+i+", pitch "+pitch);
+				chord.add(createNote(pitch, tpcArray[i], tpcArray[i], NoteHead.HEAD_AUTO)); //add notes to the chord
+			}
 		}
 		return;
 	}

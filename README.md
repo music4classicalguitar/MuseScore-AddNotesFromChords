@@ -2,13 +2,18 @@
 
 This plugin for [MuseScore 2.x] (http://musescore.org/) expands chords annotations into notes in an already existing staff and voice, which you can choose, that are directly playable by MuseScore.
 
+Supports chords with note spelling : Standard/(Full) German/Solfeggio/French, lowercase minor chords, lower case bass notes
+(Style - General - ChordSymbols, Fretboard Diagrams).
+
+It is possible to transpose the generated notes, e.g.
+- Trumpet melody (B♭) with chords in first staff, transpose all notes a major second higher for C-instruments in a second staff
+- Alto saxophone melody (E♭) with chords, transpose all notes a minor third higher for C-instruments
+
 By default it does not overwrite notes if already present, but you can choose to do so.
 
 Note length is up to the next chord.
 
 To end a chord or leave a measure empty add a chord without any meaning (for MuseScore), e.g. N.C. (No Chord).
-
-Supports Standard/Solfeggio/French in Style - General - ChordSymbols, Fretboard Diagrams.
 
 For an unpatched version of MuseScore 2.x :
 
@@ -20,10 +25,10 @@ For an unpatched version of MuseScore 2.x :
     Save your file and reopen it.
 or
 
-    Double click on the chords for which you want to add the notes
+    Transpose to anything and transpose back
 or
 
-    Transpose to anything and transpose back
+    Double click on the chords for which you want to add the notes
 before using the plugin.
 
 
